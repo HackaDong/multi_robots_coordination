@@ -27,4 +27,8 @@ multi_robots_coordination_slaver：
 
     TODO：每个机器人的执行部分，包括轨迹生成和轨迹跟踪，可以用patrol_robot包
 
-multirobot.launch：用于启动多个机器人，turtlebot
+multirobot.launch：用于启动多个机器人，turtlebot，map_server
+
+turtlebot_minimal.launch：启动机器人，激光，AMCL，遥控
+
+    TODO：
