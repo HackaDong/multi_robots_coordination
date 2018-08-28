@@ -5,12 +5,16 @@
 目前功能：处理地图，路径规划，多目标点发送，多机器人（turtlebot）启动
 
 执行顺序：
-map_server
-测试A*算法：rosrun multi_robots_coordination test11.cpp
-启动总控台：rosrun multi_robots_coordination multi_robots_coordination_master_node
-    TODO：将call（srv）分别写到函数里可以单独调用，现在写在构造函数中
-启动多个机器人，在每个机器人上分别执行：roslaunch multi_robots_coordination multirobot.launch
 
+map_server
+
+测试A*算法：rosrun multi_robots_coordination test11.cpp
+
+启动总控台：rosrun multi_robots_coordination multi_robots_coordination_master_node
+
+    TODO：将call（srv）分别写到函数里可以单独调用，现在写在构造函数中
+    
+启动多个机器人，在每个机器人上分别执行：roslaunch multi_robots_coordination multirobot.launch
 
 
 static_map：接受静态地图，处理地图，去除原始地图周围未知部分
