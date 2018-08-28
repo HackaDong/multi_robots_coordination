@@ -1,7 +1,0 @@
-<!-- xml -->
-<launch>
-
-  <include file="$(find multi_robots_coordination)/launch/robot1_bringup.launch">
-  <!--<include file="$(find multi_robot)/launch/robot2_bringup.launch">-->
-  
-</launch>

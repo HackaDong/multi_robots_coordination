@@ -17,6 +17,9 @@ tf_(tf)
     ros::NodeHandle nh;
     plan_pub_ = nh.advertise<nav_msgs::Path>("path", 1);
 
+    //TODO：需要加上TF_prefix解析，分robot1和robot2
+    //两台机器人的tf_prefix是什么样的，未知
+
     // // get our tf prefix
     // ros::NodeHandle prefix_nh;
     // std::string tf_prefix = tf::getPrefixParam(prefix_nh);
@@ -278,43 +281,44 @@ bool AStarPlanner::PointValid(geometry_msgs::PoseStamped point){
 //获取机器人位置
 bool AStarPlanner::getRobotPose(tf::Stamped<tf::Pose>& global_pose) const
 {
-  global_pose.setIdentity();
-  tf::Stamped < tf::Pose > robot_pose;
-  robot_pose.setIdentity();
-  robot_pose.frame_id_ = robot_base_frame_id;
-  robot_pose.stamp_ = ros::Time();
-  ros::Time current_time = ros::Time::now();  // save time for checking tf delay later
+    //TODO：需要加上TF_prefix解析，分robot1和robot2
+    global_pose.setIdentity();
+    tf::Stamped < tf::Pose > robot_pose;
+    robot_pose.setIdentity();
+    robot_pose.frame_id_ = robot_base_frame_id;
+    robot_pose.stamp_ = ros::Time();
+    ros::Time current_time = ros::Time::now();  // save time for checking tf delay later
 
-  // get the global pose of the robot
-  try
-  {
-    tf_.transformPose(global_frame_id, robot_pose, global_pose);
-  }
-  catch (tf::LookupException& ex)
-  {
-    ROS_ERROR_THROTTLE(1.0, "No Transform available Error looking up robot pose: %s\n", ex.what());
-    return false;
-  }
-  catch (tf::ConnectivityException& ex)
-  {
-    ROS_ERROR_THROTTLE(1.0, "Connectivity Error looking up robot pose: %s\n", ex.what());
-    return false;
-  }
-  catch (tf::ExtrapolationException& ex)
-  {
-    ROS_ERROR_THROTTLE(1.0, "Extrapolation Error looking up robot pose: %s\n", ex.what());
-    return false;
-  }
-  // check global_pose timeout
-  if (current_time.toSec() - global_pose.stamp_.toSec() > transform_tolerance_)
-  {
-    ROS_WARN_THROTTLE(1.0,
-                      "Costmap2DROS transform timeout. Current time: %.4f, global_pose stamp: %.4f, tolerance: %.4f",
-                      current_time.toSec(), global_pose.stamp_.toSec(), transform_tolerance_);
-    return false;
-  }
+    // get the global pose of the robot
+    try
+    {
+        tf_.transformPose(global_frame_id, robot_pose, global_pose);
+    }
+    catch (tf::LookupException& ex)
+    {
+        ROS_ERROR_THROTTLE(1.0, "No Transform available Error looking up robot pose: %s\n", ex.what());
+        return false;
+    }
+    catch (tf::ConnectivityException& ex)
+    {
+        ROS_ERROR_THROTTLE(1.0, "Connectivity Error looking up robot pose: %s\n", ex.what());
+        return false;
+    }
+    catch (tf::ExtrapolationException& ex)
+    {
+        ROS_ERROR_THROTTLE(1.0, "Extrapolation Error looking up robot pose: %s\n", ex.what());
+        return false;
+    }
+    // check global_pose timeout
+    if (current_time.toSec() - global_pose.stamp_.toSec() > transform_tolerance_)
+    {
+        ROS_WARN_THROTTLE(1.0,
+                        "Costmap2DROS transform timeout. Current time: %.4f, global_pose stamp: %.4f, tolerance: %.4f",
+                        current_time.toSec(), global_pose.stamp_.toSec(), transform_tolerance_);
+        return false;
+    }
 
-  return true;
+    return true;
 }
 
 
