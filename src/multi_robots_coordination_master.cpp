@@ -57,14 +57,16 @@ MultiRobotsCoordinationMaster::~MultiRobotsCoordinationMaster(){
     delete astar_planner;
 }
 
-void MultiRobotsCoordinationMaster::odomCB1(const nav_msgs::Odometry::ConstPtr &odom){
-        //current_pose1 = odom->pose.pose;
-        //printf("%f, %f, %f, %f\n", current_pose.position.x, current_pose.position.y, current_pose.orientation.z, current_pose.orientation.w);
-    }
+// void MultiRobotsCoordinationMaster::odomCB1(const nav_msgs::Odometry::ConstPtr &odom){
+//         //current_pose1 = odom->pose.pose;
+//         //printf("%f, %f, %f, %f\n", current_pose.position.x, current_pose.position.y, current_pose.orientation.z, current_pose.orientation.w);
+//     }
 
-void MultiRobotsCoordinationMaster::odomCB2(const nav_msgs::Odometry::ConstPtr &odom){
-        //current_pose2 = odom->pose.pose;
-        //printf("%f, %f, %f, %f\n", current_pose.position.x, current_pose.position.y, current_pose.orientation.z, current_pose.orientation.w);
-    }
+// void MultiRobotsCoordinationMaster::odomCB2(const nav_msgs::Odometry::ConstPtr &odom){
+//         //current_pose2 = odom->pose.pose;
+//         //printf("%f, %f, %f, %f\n", current_pose.position.x, current_pose.position.y, current_pose.orientation.z, current_pose.orientation.w);
+//     }
+
+
 
 };

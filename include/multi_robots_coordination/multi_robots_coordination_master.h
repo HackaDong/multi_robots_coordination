@@ -17,8 +17,8 @@ class MultiRobotsCoordinationMaster
 public:
     MultiRobotsCoordinationMaster(tf::TransformListener& tf, geometry_msgs::PoseStamped p1, geometry_msgs::PoseStamped p2);
     virtual ~MultiRobotsCoordinationMaster();
-    void odomCB1(const nav_msgs::Odometry::ConstPtr &odom);
-    void odomCB2(const nav_msgs::Odometry::ConstPtr &odom);
+    // void odomCB1(const nav_msgs::Odometry::ConstPtr &odom);
+    // void odomCB2(const nav_msgs::Odometry::ConstPtr &odom);
     void sendPath1Service(multi_robots_coordination::SendPath);
     void sendPath2Service(multi_robots_coordination::SendPath);
 private:

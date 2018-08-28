@@ -210,26 +210,6 @@ include_directories(
 
 #------------------------------------------------------------------------------------------
 
-
-# add_library(controller
-#   include/multi_robots_coordination/controller.h
-#   src/controller.cpp
-# )
-# add_dependencies(controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(controller
-#   ${catkin_LIBRARIES}
-# )
-
-# add_library(trajectory
-#   include/multi_robots_coordination/trajectory.h
-#   src/trajectory.cpp
-# )
-# add_dependencies(trajectory ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(trajectory
-#   ${catkin_LIBRARIES}
-# )
-
-
 add_library(multi_robots_coordination_master
   include/multi_robots_coordination/multi_robots_coordination_master.h
   src/multi_robots_coordination_master.cpp
