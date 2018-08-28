@@ -23,6 +23,8 @@ astar_planner：根据上述地图提供的接口、当前位置和目标位置�
 
 multi_robots_coordination_master：将每个机器人对应的规划路径分别发送给每个机器人
 
-multi_robots_coordination_slaver：TODO，每个机器人的执行部分，包括轨迹生成和轨迹跟踪，可以用patrol_robot包
+multi_robots_coordination_slaver：
+
+    TODO：每个机器人的执行部分，包括轨迹生成和轨迹跟踪，可以用patrol_robot包
 
 multirobot.launch：用于启动多个机器人，turtlebot
