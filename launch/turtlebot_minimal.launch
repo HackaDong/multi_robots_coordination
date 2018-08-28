@@ -1,0 +1,118 @@
+<launch>
+  <!-- Turtlebot -->
+  <arg name="robot_ns"/>
+
+  <group ns="$(arg robot_ns)">
+  <arg name="base"              default="$(env TURTLEBOT_BASE)"         doc="mobile base type [create, roomba]"/>
+  <arg name="battery"           default="$(env TURTLEBOT_BATTERY)"      doc="kernel provided locatio for battery info, use /proc/acpi/battery/BAT0 in 2.6 or earlier kernels." />
+  <arg name="stacks"            default="$(env TURTLEBOT_STACKS)"       doc="stack type displayed in visualisation/simulation [circles, hexagons]"/>
+  <arg name="3d_sensor"         default="$(env TURTLEBOT_3D_SENSOR)"    doc="3d sensor types [kinect, asux_xtion_pro]"/>
+  <arg name="simulation"        default="$(env TURTLEBOT_SIMULATION)"   doc="set flags to indicate this turtle is run in simulation mode."/>
+  <arg name="serialport"        default="$(env TURTLEBOT_SERIAL_PORT)"  doc="used by create to configure the port it is connected on [/dev/ttyUSB0, /dev/ttyS0]"/>
+
+  <param name="/use_sim_time" value="$(arg simulation)"/>
+  <param name="tf_prefix" type="string" value="$(arg robot_ns)_tf"/>
+
+  <!--
+      Collection of robot-centric definitions and nodes for the turtlebot. 
+    -->
+  <include file="$(find turtlebot_bringup)/launch/includes/description.launch.xml">
+      <arg name="base" value="$(arg base)" />
+      <arg name="stacks" value="$(arg stacks)" />
+      <arg name="3d_sensor" value="$(arg 3d_sensor)" />
+  </include>
+  
+  <!-- important generally, but specifically utilised by the current app manager -->  
+  <param name="robot/name" value="$(optenv ROBOT turtlebot)"/>
+  <param name="robot/type" value="turtlebot"/>
+  
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="tf_prefix" type="string" value="$(arg robot_ns)_tf"/>
+    <param name="publish_frequency" type="double" value="5.0" />
+  </node>
+
+  <!--<node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
+    <rosparam command="load" file="$(find turtlebot_bringup)/param/$(arg base)/diagnostics.yaml" />
+  </node>-->
+
+  
+  <!--
+    Kobuki's implementation of turtlebot's mobile base.
+  -->
+  <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager">
+  </node>
+  
+  <node pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet mobile_base_nodelet_manager">      
+    <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>      
+    <param name="odom_frame" type="string"  value="$(arg robot_ns)_tf/odom"/>
+    <param name="base_frame" type="string"  value="$(arg robot_ns)_tf/base_footprint"/>
+    <param name="device_port" value="$(arg serialport)" />
+  
+    <remap from="mobile_base/odom" to="/$(arg robot_ns)/odom"/>
+    
+    <!-- Don't do this - force applications to use a velocity mux for redirection  
+<remap from="mobile_base/commands/velocity" to="cmd_vel"/> 
+    -->
+    <remap from="mobile_base/enable" to="enable"/>
+    <remap from="mobile_base/disable" to="disable"/>
+    <remap from="mobile_base/joint_states" to="/$(arg robot_ns)/joint_states"/>
+  </node>
+
+  <!-- velocity commands multiplexer -->
+  <node pkg="nodelet" type="nodelet" name="cmd_vel_mux" args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+    
+    <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml"/>
+    <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
+  </node>
+  
+  <!-- bumper/cliff to pointcloud -->
+  <!--<include file="$(find turtlebot_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/>
+
+  <include file="$(find turtlebot_bringup)/launch/includes/netbook.launch.xml">
+    <arg name="battery" value="$(arg battery)" />
+  </include>-->
+
+  <!-- For seperate maps -->   
+    <node pkg="tf" type="static_transform_publisher" name="static_publisher" args="0 0 0 0 0 0 /map /$(arg robot_ns)_tf/odom 100"/> 
+
+
+  <!-- Hokuyo -->   
+  <arg name="scan_topic" default="/$(arg robot_ns)/scan" />
+  <arg name="laser_frame" default="$(arg robot_ns)_tf/laser_frame" />
+  <!--arg name="laser_frame" default="base_laser_link" /-->
+  <arg name="laser_port" default="/dev/hokuyo" />
+
+  <node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node">
+    <param name="port" type="string" value="$(arg laser_port)"/>
+    <param name="min_ang" value="-1.7" />
+    <param name="max_ang" value="1.7" />
+    <param name="min_range" value="0.18" />
+    <param name="hokuyo_node/calibrate_time" value="true" />
+    <param name="frame_id" value="$(arg laser_frame)" />
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser4" 
+   args="0.18 0.0 0.2 0.0 0.0 0.0 /$(arg robot_ns)_tf/base_footprint $(arg laser_frame) 40" />
+
+  <!-- AMCL -->
+  <arg name="custom_amcl_launch_file" default="$(find turtlebot_navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_a" default="0.0"/>
+  <include file="$(arg custom_amcl_launch_file)">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include>
+
+  <!-- turtlebot_teleop_key already has its own built in velocity smoother -->
+  <node pkg="turtlebot_teleop" type="turtlebot_teleop_key" name="turtlebot_teleop_keyboard"  output="screen">
+    <param name="scale_linear" value="0.5" type="double"/>
+    <param name="scale_angular" value="1.5" type="double"/>
+    <remap from="turtlebot_teleop_keyboard/cmd_vel" to="cmd_vel_mux/input/teleop"/>
+  </node>
+
+  </group>
+
+</launch>

@@ -1,0 +1,45 @@
+<launch>
+
+  <arg name="robot_ns"/>
+
+  <group ns="$(arg robot_ns)">
+  <include file="$(find dashgo_driver)/launch/demo.launch"/>
+  <!--include file="$(find flashgo)/launch/flash_lidar.launch"/-->
+
+  <arg name="scan_topic" default="/$(arg robot_ns)/scan" />
+    <arg name="laser_frame" default="$(arg robot_ns)/laser_frame" />
+    <!--arg name="laser_frame" default="base_laser_link" /-->
+    <arg name="laser_port" default="/dev/hokuyo" />
+
+  <node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node">
+    <param name="port" type="string" value="$(arg laser_port)"/>
+    <param name="min_ang" value="-1.7" />
+    <param name="max_ang" value="1.7" />
+    <param name="min_range" value="0.18" />
+    <param name="hokuyo_node/calibrate_time" value="true" />
+    <param name="frame_id" value="$(arg laser_frame)" />
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
+
+  <include file="$(find dashgo_description)/launch/dashgo_description.launch"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser4" 
+   args="0.18 0.0 0.2 0.0 0.0 0.0 $(arg robot_ns)/base_footprint $(arg robot_ns)/laser_frame 40" />
+
+
+  <arg name="initial_pose_x" default="0.0"/> 
+  <arg name="initial_pose_y" default="0.0"/> 
+  <arg name="initial_pose_a" default="0.0"/>
+  <include file="$(find dashgo_nav)/launch/include/odom/amcl.launch.xml">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include>
+
+  <!--include file="$(find dashgo_nav)/launch/include/odom/dwa_move_base.launch"/-->
+  <!--include file="$(find world_canvas_server)/launch/world_canvas_server.launch"/>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/-->
+  <node name="robot_pose_publisher" pkg="robot_pose_publisher" type="robot_pose_publisher" />
+
+  </group>
+</launch>

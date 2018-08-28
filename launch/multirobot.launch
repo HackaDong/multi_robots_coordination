@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+    <!-- Map server -->
+    <arg name="map_file" default="$(find dashgo_nav)/maps/lab307_4.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />  
+
+
+    <!-- BEGIN ROBOT 1-->
+    <arg name="robot_ns"             default="robot1"/>
+    <include file="$(find multi_robots_coordination)/launch/turtlebot_minimal.launch" >
+        <arg name="robot_ns" value="$(arg robot_ns)" />
+    </include>
+ 
+    
+    <!-- BEGIN ROBOT 2 -->
+    <!--<arg name="robot_ns"             default="robot2"/>
+    <include file="$(find multi_robots_coordination)/launch/turtlebot_minimal.launch" >
+        <arg name="robot_ns" value="$(arg robot_ns)" />
+    </include>-->
+
+    
+    <!-- BEGIN ROBOT 3 -->
+    <!--
+    <group ns="robot3">
+        <param name="tf_prefix" value="robot3_tf" />
+    </group>
+    <include file="$(find multirobot)/launch/one_robot.launch" >
+      <arg name="init_pose_x" value="1" />
+      <arg name="init_pose_y" value="3"/>
+      <arg name="init_pose_a" value="3.14"/>
+      <arg name="robot_name"  value="robot3" />
+    </include>
+    -->
+</launch>
