@@ -31,4 +31,4 @@ multirobot.launch：用于启动多个机器人，turtlebot，map_server
 
 turtlebot_minimal.launch：启动机器人，激光，AMCL，遥控
 
-    TODO：
+    TODO：dashgo_minimal.launch
